@@ -34,18 +34,18 @@
     (is (not (r {:request-method :post
                  :uri "/foo"})))))
 
-(defpage foo "/bar" [req])
+(defpage bar "/bar" [req])
 (deftest route-names-are-preserved
-  (is #'foo)
-  (is (:defpage.core/defpage (meta #'foo)))
-  (is (:defpage.core/method (meta #'foo))))
+  (is #'bar)
+  (is (:defpage.core/defpage (meta #'bar)))
+  (is (:defpage.core/method (meta #'bar))))
 
 (deftest route-matches-properly
-  (is (d/route-matches? #'foo {:request-method :get
+  (is (d/route-matches? #'bar {:request-method :get
                                :uri "/bar"}))
-  (is (not (d/route-matches? #'foo {:request-method :get
+  (is (not (d/route-matches? #'bar {:request-method :get
                                     :uri "/bogus"})))
-  (is (not (d/route-matches? #'foo {:request-method :post
+  (is (not (d/route-matches? #'bar {:request-method :post
                                     :uri "/bar"}))))
 
 (deftest routes-can-be-compiled
