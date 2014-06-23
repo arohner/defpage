@@ -1,7 +1,7 @@
 (ns defpage.core-test
   (:require [clojure.test :refer :all]
             [clout.core :as clout]
-            [defpage.core :as d]))
+            [defpage.core :as d :refer (defpage)]))
 
 (deftest parse-args-works
   (let [result (d/parse-args '(foo "/foo" [req] {:status 200}))]
@@ -11,15 +11,15 @@
     (is (= '[req] (:destruct result)))
     (is (= '({:status 200}) (:body result))))
 
-  (let [result (parse-args '(foo [:post "/foo"] [req] {:body "hello"}))]
+  (let [result (d/parse-args '(foo [:post "/foo"] [req] {:body "hello"}))]
     (is (= :post (:method result))))
 
-  (let [result (parse-args '("/foo" [req] {:body "hello"}))]
+  (let [result (d/parse-args '("/foo" [req] {:body "hello"}))]
     (is (:name result)))
 
-  (is (parse-args '([:post "/foo"] [req] {:body "hello"})))
+  (is (d/parse-args '([:post "/foo"] [req] {:body "hello"})))
 
-  (let [result (is (parse-args '([:get "/users/:id" {:id #"\d+"}] [req] {:body "hello"})))]
+  (let [result (d/parse-args '([:get "/users/:id" {:id #"\d+"}] [req] {:body "hello"}))]
     (is (map? (:regexes result)))))
 
 (defpage foo "/foo" [req]
@@ -49,7 +49,7 @@
                                     :uri "/bar"}))))
 
 (deftest routes-can-be-compiled
-  (let [args (parse-args '([:get "/users/:id" {:id #"\d+"}] [req] {:body "hello"}))]
+  (let [args (d/parse-args '([:get "/users/:id" {:id #"\d+"}] [req] {:body "hello"}))]
     (clout/route-compile (:path args) (:regexes args))))
 
 (defpage regex-route [:post "/user/:id" {:id #"\d+"}] [req]
