@@ -75,7 +75,7 @@
   (let [{:keys [name method path regexes destruct body]
          :as args} (parse-args args)]
     `(let [body-fn# (fn [request#]
-                      (let [~destruct request#]
+                      (let [~@destruct request#]
                         ~@body))
            path# ~path
            regexes# ~regexes

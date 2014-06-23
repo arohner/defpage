@@ -25,6 +25,10 @@
 (defpage foo "/foo" [req]
   {:status 200})
 
+(deftest simple-calling-works
+  (is (foo {:uri "/foo"
+            :request-method :get})))
+
 (deftest make-route-works
   (let [r (d/make-route :get "/foo" (fn [req] {:status 200}))]
     (is (r {:request-method :get
