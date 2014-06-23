@@ -138,4 +138,8 @@
 (defn url-for
   "Given a defpage"
   [route args]
-  )
+  (let [compiled-route (-> route meta ::route)
+        route-args (-> compiled-route :keys)]
+    (assert (= (set (keys args)) (set route-args)) (format "url-for arg names must match route params: %s vs. %s" (seq route-args) (keys args)))
+    (reduce (fn [path k]
+              (str/replace-first path #"\([^\)]+\)" (str (get args k)))) (-> compiled-route :re str) route-args)))

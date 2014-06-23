@@ -62,4 +62,6 @@
                                             :uri "/user/bogus"}))))
 
 (deftest url-for-works
-  (is (= "/user/5" (d/url-for regex-route {:id 5}))))
+  (is (= "/user/5" (d/url-for regex-route {:id 5})))
+  (testing "url-for throws on invalid args"
+    (is (thrown? AssertionError (d/url-for regex-route {:bogus "foo"})))))
