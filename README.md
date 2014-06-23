@@ -14,7 +14,7 @@ A simple library for defining ring handlers, a more flexible & powerful version 
 
 ```
 
-the defpage macro takes an optional route name, the route path, then the standard arguments and function body. defpage functions always take a single argument, the ring request
+the defpage macro takes an optional route name, the route path, then the standard arguments and function body. It defn's a function of one argument, a ring request.
 
 The route path can also be a vector, to specify which HTTP methods it responds to:
 
@@ -23,13 +23,25 @@ The route path can also be a vector, to specify which HTTP methods it responds t
   "successful post")
 ```
 
+Regexes can also be specified
+
+```clojure
+(defpage ping-user [:post "/user/:id/ping" {:id #"\d+"}] ...)
+```
+
+The full grammar is:
+(defpage Name? Route fn-binding body)
+
+Route = String | [Request-Method Route-Path Route-Regex?] ;
+Request-Method = Keyword ;
+Request-Path = String ;
+
 `defpage` is mostly stateless, it's only sugar on top of defn. To hook up your new routes to ring, use `collect-routes:`
 
 ```clojure
 (collect-routes my-ns.foo)
 ```
-
-`collect-routes` returns a fn that behaves like a compojure handler, a fn that takes a request, and returns a ring response, or nil if no route matched. defpages are ordered according to line number (from the :line metadata) in the namespace.
+`collect-routes` collects all defpages in a single namespace, and returns a handler function that behaves like a compojure handler: a fn that takes a request, and returns a ring response, or nil if no route matched. defpages are ordered according to line number (from the :line metadata) in the namespace.
 
 Route ordering between namespaces can be handled using standard ring/compojure techniques:
 
@@ -38,6 +50,18 @@ Route ordering between namespaces can be handled using standard ring/compojure t
   (compojure.core/routes
     (collect-routes 'foo)
     (collect-routes 'bar)))
+```
+
+## testing
+defpages and collect routes both return simple fns that take ring request and return ring responses (or nil), so testing is easy. You can pass a ring request to a defpage fn, or the result of collect-routes:
+
+```clojure
+(defpage foo [req]
+  {:status 200
+   :body "hello world"})
+
+(deftest foo-works
+  (is (= 200 (foo {:uri "/foo" :request-method :get}))))
 ```
 
 ## map-wrap-routes
@@ -86,9 +110,6 @@ defpage uses clout, so you can use keywords in routes:
 
 (defpage "/user/:id" ...)
 
-Regexes can also be specified
-
-(defpage ping-user [:post "/user/:id/ping" {:id #"\d+"}] ...)
 
 You can use url-for to return a complete path, given a route
 
