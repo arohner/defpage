@@ -25,11 +25,6 @@
                     (str/replace #"\*" "<")))))
 
 (defn parse-route [[{:keys [name] :as result} [route :as args]]]
-  (assert (or (and (vector? route)
-                   (keyword? (first route))
-                   (string? (second route)))
-              (string? route))
-          (format "Routes must either be a string or vector, got %s" route))
   (let [{:keys [method path] :as route} (if (vector? route)
                                           {:method (first route)
                                            :path (second route)
@@ -64,9 +59,9 @@
   [method route handler]
   (assert (or (keyword? method) (nil? method)))
   (let [f (#'compojure/if-method method
-            (#'compojure/if-route route
-                                  (fn [request]
-                                    (compojure.response/render (handler request) request))))]
+                                 (#'compojure/if-route route
+                                                       (fn [request]
+                                                         (compojure.response/render (handler request) request))))]
     (with-meta f (merge (meta f) {::defpage true
                                   ::method method
                                   ::route route}))))
@@ -74,12 +69,16 @@
 (defmacro defpage [& args]
   (let [{:keys [name method path regexes destruct body]
          :as args} (parse-args args)]
+    (assert (symbol? name) "name must be a symbol")
     `(let [body-fn# (fn [request#]
                       (let [~@destruct request#]
                         ~@body))
            path# ~path
            regexes# ~regexes
            method# ~method
+           _# (assert (keyword? method#))
+           _# (assert (string? path#))
+
            compiled-route# (if regexes#
                              (clout/route-compile path# regexes#)
                              (clout/route-compile path#))
