@@ -105,13 +105,16 @@
   (fn [request]
     (apply compojure/routing request handlers)))
 
-(defn collect-routes
+(defn collect-routes*
   "find all defpages defined in ns. Returns a ring handler. With no args, collects routes in the current ns"
-  ([]
-     (collect-routes *ns*))
   ([& nses]
      (let [handlers (mapcat find-defpages nses)]
        (combine-routes handlers))))
+
+(defmacro collect-routes []
+  ;; capture the ns at compile time, so the value of *ns* doesn't change when e.g. calling (collect-routes) in a fn
+  (let [ns *ns*]
+    `(collect-routes* ~ns)))
 
 (defn route-matches?
   "Takes a defpage fn, returns truthy if the request matches"
