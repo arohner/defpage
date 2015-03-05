@@ -7,7 +7,7 @@ A simple library for defining ring handlers, a more flexible & powerful version 
 [![Clojars Project](http://clojars.org/defpage/latest-version.svg)](http://clojars.org/defpage)
 
 ```clojure
-(:require [defpage.core :as defpage])
+(:require [defpage.core :as defpage :refer (defpage)])
 
 (defpage foo "/foo/bar" [request]
   "hello world")
