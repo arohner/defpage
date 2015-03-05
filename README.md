@@ -44,20 +44,21 @@ defpage uses compojure and clout under the hood, so all standard compojure/clout
     ...))
 ```
 
-`defpage` is mostly stateless, it basically just creates a normal defn with extra metadata. To hook up your new routes to ring, use `collect-routes:`
+`defpage` is mostly stateless, in that defining a page doesn't automatically make it serve pages. The macro just creates a normal defn with extra metadata. To hook up your new routes to ring, use `collect-routes:`
 
 ```clojure
-(collect-routes my-ns.foo)
+(collect-routes)
+(collect-routes* my-ns.foo)
 ```
-`collect-routes` collects all defpages in a single namespace, and returns a handler function that behaves like a compojure handler: a fn that takes a request, and returns a ring response, or nil if no route matched. defpages are ordered according to line number (from the :line metadata) in the namespace.
+`collect-routes` collects all defpages in a single namespace, and returns a handler function that behaves like a compojure handler: a fn that takes a request, and returns a ring response, or nil if no route matched. Called with no arguments, it collects routes in the current namespace. defpages are ordered according to line number (from the :line metadata) in the namespace.
 
 Route ordering between namespaces can be handled using standard ring/compojure techniques:
 
 ```clojure
 (defn handler []
   (compojure.core/routes
-    (collect-routes 'foo)
-    (collect-routes 'bar)))
+    (collect-routes* 'foo)
+    (collect-routes* 'bar)))
 ```
 
 ## testing
