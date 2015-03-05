@@ -36,7 +36,15 @@ Route = String | [Request-Method Route-Path Route-Regex?] ;
 Request-Method = Keyword ;
 Request-Path = String ;
 
-`defpage` is mostly stateless, it's only sugar on top of defn. To hook up your new routes to ring, use `collect-routes:`
+defpage uses compojure and clout under the hood, so all standard compojure/clout route syntax works. route params are available to the function in the request object.
+
+```clojure
+(defpage user [:get  "/user/:id" {:id #"\d+"}] [req]
+  (let [uid (-> req :params :id)]
+    ...))
+```
+
+`defpage` is mostly stateless, it basically just creates a normal defn with extra metadata. To hook up your new routes to ring, use `collect-routes:`
 
 ```clojure
 (collect-routes my-ns.foo)
@@ -104,12 +112,6 @@ routes defined by defpage are just standard defns with extra metadata:
  :defpage.core/method :get
  :defpage.core/route "/foo/bar"}
 ```
-
-## params, url-for
-defpage uses clout, so you can use keywords in routes:
-
-(defpage "/user/:id" ...)
-
 
 You can use url-for to return a complete path, given a route
 
