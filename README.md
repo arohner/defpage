@@ -120,9 +120,13 @@ You can use url-for to return a complete path, given a route
 => "/user/10/ping"
 
 
+## Changelog
+
+0.1.4 - map-wrap-routes now updates the request `:params` to contain the route params from the matching route. Also updates the request to includ `:defpage.core/method` and `:defpage.core/route` of the matching route.
+
 ## License
 
-Copyright © 2014 Allen Rohner.
+Copyright © 2015 Allen Rohner.
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.

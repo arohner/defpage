@@ -1,7 +1,9 @@
 (ns defpage.core
   (:require [clout.core :as clout]
             [clojure.string :as str]
-            [compojure.core :as compojure]))
+            [compojure.core :as compojure]
+            [ring.util.codec :as codec]
+            [medley.core :refer [map-vals]]))
 
 (defn sym-with-meta
   "Given a symbol, return the symbol w/ metadata"
@@ -136,8 +138,15 @@
   (map (fn [handler]
          (let [new-handler (middleware handler)]
            (fn [request]
-             (when (route-matches? handler request)
-               (new-handler request))))) routes))
+             (when-let [params (route-matches? handler request)]
+               (let [method (-> handler meta ::method)
+                     route (-> handler meta ::route)
+                     route-params (map-vals codec/url-decode params)
+                     request (-> request
+                                 (assoc ::method method
+                                        ::route route)
+                                 (#(merge-with merge % {:route-params route-params, :params route-params})))]
+                 (new-handler request)))))) routes))
 
 (defn url-for
   "Given a defpage"
