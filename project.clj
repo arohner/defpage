@@ -1,4 +1,4 @@
-(defproject defpage "0.1.4-SNAPSHOT"
+(defproject defpage "0.1.4"
   :description "A simple way to generate ring handlers"
   :url "https://github.com/arohner/defpage"
   :license {:name "Eclipse Public License"
